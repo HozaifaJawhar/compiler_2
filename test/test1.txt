@@ -1,0 +1,40 @@
+import { CommonModule, NgIf } from '@angular/common';
+import { MyDirective } from './directives';
+import { AnotherComponent } from './components';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [CommonModule, MyDirective, AnotherComponent],
+  template: `<div *ngIf="isVisible">Hello {{name}}</div>`,
+  styles: [`div { color: red; }`, `p { font-size: 14px; }`]
+})
+export class AppComponent {
+  name: string = 'Angular';
+  count: number = 0;
+  isVisible: boolean = true;
+
+  constructor() {}
+
+  toggleVisibility(): void {
+    this.isVisible = !this.isVisible;
+  }
+
+  increment(): void {
+    this.count++;
+  }
+
+  getStatus(item: { active: boolean }): string {
+    return item.active ? 'Active' : 'Inactive';
+  }
+
+  complexLogic(): void {
+    let i: number = 0;
+    while (i < 5) {
+      if (i == 3) {
+        break;
+      }
+      i++;
+    }
+  }
+}

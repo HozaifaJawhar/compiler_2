@@ -1,0 +1,20 @@
+import { Component } from '@angular/core';
+
+@Component({
+  standalone: true,
+  imports: [],
+  styles: []
+})
+
+export class TestExpressionsComponent {
+  x : int = 10 + 2 * 3 / 4 - 5 % 2;
+  y : int = this.x > 3 && this.x < 20 || this.x == 10;
+  z = !false;
+  a = (1 + 2) * (3 - 4) / 5;
+  b = true ? 'yes' : 'no';
+  c = this.x == this.y ? this.z : this.a + this.b.length;
+  f = x + 1;
+  t = 0;
+  h = 50 / t;
+  result = this.x + 1;
+}

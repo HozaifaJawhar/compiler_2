@@ -1,0 +1,32 @@
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'calc-component',
+  template: `<p>Calculator works!</p>`
+})
+
+export class Calculator {
+  add(): number {
+    let a : number = 10;
+    let b : number = 5;
+    return a + b;
+  }
+
+  subtract(): number {
+    let c : number = 10;
+    let d : number = 5;
+    return c - d;
+  }
+
+  multiply(): number {
+    let e : number = 10;
+    let f : number = 5;
+    return e * f;
+  }
+
+  divide(): number {
+    let g : number = 10;
+    let h : number = 0;
+    return g / h;
+  }
+}

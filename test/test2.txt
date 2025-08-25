@@ -1,0 +1,32 @@
+import { Component, Hi } from '@angular/core';
+
+@Component({
+  selector: 'app-user-status',
+  standalone: true,
+  template: `
+    <p>{{ getStatusMessage() }}</p>
+  `
+})
+export class UserStatusComponent {
+  userId: number = 1;
+  userName: string = 'Alice';
+  isActive: boolean = false;
+  retryCount: number = 0;
+
+  constructor(x : int, y : int) {
+    this.initialize();
+  }
+
+  getStatusMessage() {
+    return this.isActive ? `${this.userName} is active` : `${this.userName} is inactive`;
+  }
+
+  fetchUserStatus() {
+    if (this.userId % 2 == 1) {
+        this.isActive = true;
+        name(maxCount);
+        return true;
+    }
+    return false;
+  }
+}
