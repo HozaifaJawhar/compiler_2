@@ -15,7 +15,7 @@ public class Main {
     public static void main(String[] args)
     {
         try {
-            String inputFile = "test/test4.txt";
+            String inputFile = "test/test_main.txt";
 
             CharStream input = CharStreams.fromFileName(inputFile);
 
