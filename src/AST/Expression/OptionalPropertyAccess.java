@@ -1,9 +1,9 @@
 package AST.Expression;
 
-public class PropertyAccess implements PostfixPart {
+public class OptionalPropertyAccess implements PostfixPart {
     private final String property;
 
-    public PropertyAccess(String property) {
+    public OptionalPropertyAccess(String property) {
         this.property = property;
     }
 
@@ -13,6 +13,6 @@ public class PropertyAccess implements PostfixPart {
 
     @Override
     public String toString() {
-        return "." + property;
+        return "?." + property;
     }
 }

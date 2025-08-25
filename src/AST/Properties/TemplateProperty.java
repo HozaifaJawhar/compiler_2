@@ -1,20 +1,34 @@
 package AST.Properties;
 
-import AST.Properties.ComponentProperty;
+import AST.Expression.TemplateLiteral;
 
-public class TemplateProperty implements ComponentProperty
-{
-    private final String _template;
-    public TemplateProperty(String template)
-    {
-        _template = template;
+public class TemplateProperty implements ComponentProperty {
+
+    private final TemplateLiteral _template;
+
+    public TemplateProperty(TemplateLiteral template) {
+        this._template = template;
     }
-    public String getTemplate() {
+
+    public TemplateProperty(String backtickTokenText) {
+        this._template = new TemplateLiteral(backtickTokenText);
+    }
+
+    public TemplateLiteral getTemplateLiteral() {
         return _template;
     }
+
+    public String getRawTemplate() {
+        return _template.getRaw();
+    }
+
+    @Deprecated
+    public String getTemplate() {
+        return _template.getRaw();
+    }
+
     @Override
-    public String toString()
-    {
+    public String toString() {
         return "TemplateProperty";
     }
 }

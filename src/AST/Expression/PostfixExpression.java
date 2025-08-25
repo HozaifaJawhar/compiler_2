@@ -3,26 +3,26 @@ package AST.Expression;
 import java.util.List;
 
 public class PostfixExpression implements Expression {
-    private final Expression _base;
-    private final List<Object> _parts;
-    public PostfixExpression(Expression base, List<Object> parts)
-    {
-        _base = base;
-        _parts = parts;
+    private final Expression base;
+    private final List<PostfixPart> parts;
+
+    public PostfixExpression(Expression base, List<PostfixPart> parts) {
+        this.base = base;
+        this.parts = parts;
     }
-    public Expression getBase()
-    {
-        return _base;
+
+    public Expression getBase() {
+        return base;
     }
-    public List<Object> getParts()
-    {
-        return _parts;
+
+    public List<PostfixPart> getParts() {
+        return parts;
     }
+
     @Override
-    public String toString()
-    {
-        StringBuilder sb = new StringBuilder(_base.toString());
-        for (Object part : _parts) {
+    public String toString() {
+        StringBuilder sb = new StringBuilder(base.toString());
+        for (PostfixPart part : parts) {
             sb.append(part.toString());
         }
         return sb.toString();
