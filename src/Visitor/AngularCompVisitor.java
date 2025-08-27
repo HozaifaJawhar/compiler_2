@@ -41,13 +41,14 @@ public class AngularCompVisitor extends AngularParserBaseVisitor
 
     private String extractTypeName(TypeAnnotation type)
     {
-        if(type.getPrimaryType() instanceof IdentifierType) {
-            return ((IdentifierType) type.getPrimaryType()).getName();
+        if(type.getType() instanceof IdentifierType) {
+            return ((IdentifierType) type.getType()).getName();
         }
         return null;
     }
     @Override
     public Object visitProgram(AngularParser.ProgramContext ctx) {
+        // 1) imports
         List<ImportStatement> importStatements = new ArrayList<>();
         for (AngularParser.ImportStatementContext importCtx : ctx.importStatement()) {
             ImportStatement impStmt = (ImportStatement) visit(importCtx);
@@ -58,7 +59,13 @@ public class AngularCompVisitor extends AngularParserBaseVisitor
         int column = ctx.getStart().getCharPositionInLine() + 1;
 
         if (!importedIdentifiers.contains("Component")) {
-            errorReporter.report(new ComponentImportMissingError("ComponentImportMissingError", line, column ));
+            errorReporter.report(new ComponentImportMissingError("ComponentImportMissingError", line, column));
+        }
+
+        List<InterfaceDeclaration> interfaces = new ArrayList<>();
+        for (AngularParser.InterfaceDeclarationContext ifaceCtx : ctx.interfaceDeclaration()) {
+            InterfaceDeclaration iface = (InterfaceDeclaration) visit(ifaceCtx);
+            interfaces.add(iface);
         }
 
         List<ComponentDefinition> components = new ArrayList<>();
@@ -68,13 +75,11 @@ public class AngularCompVisitor extends AngularParserBaseVisitor
         }
 
         CycleDetector detector = new CycleDetector(dependencyGraph);
-        boolean foundCycle = detector.hasCycle();
-
-        if (foundCycle) {
+        if (detector.hasCycle()) {
             errorReporter.report(new CircularDependencyError());
         }
 
-        return new Program(importStatements, components);
+        return new Program(importStatements, interfaces, components);
     }
 
     @Override

@@ -262,12 +262,12 @@ objectLiteral
     ;
 
 objectElement
-    : keyValue
-    | spreadElement
+    : keyValue                                                  #keyVal
+    | spreadElement                                             #spreadElem
     ;
 
 spreadElement
-    : ELLIPSIS expression
+    : ELLIPSIS expression                                       #spreadElemen
     ;
 
 keyValue
