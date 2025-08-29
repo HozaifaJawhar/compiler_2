@@ -1,4 +1,4 @@
-// Generated from C:/Users/pc/IdeaProjects/AngularCompiler/src/antlr/AngularParser.g4 by ANTLR 4.13.2
+// Generated from /Users/hozaifajohar/Desktop/desk/COLLAGE_FORTH_YEAR/AngularCompiler/compiler_2/src/antlr/AngularParser.g4 by ANTLR 4.13.2
 package antlr;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
@@ -44,6 +44,24 @@ public interface AngularParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitModulePathString(AngularParser.ModulePathStringContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link AngularParser#interfaceDeclaration}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitInterfaceDeclaration(AngularParser.InterfaceDeclarationContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link AngularParser#interfaceMembers}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitInterfaceMembers(AngularParser.InterfaceMembersContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link AngularParser#interfaceMember}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitInterfaceMember(AngularParser.InterfaceMemberContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code componentDef}
 	 * labeled alternative in {@link AngularParser#componentDefinition}.
@@ -191,6 +209,18 @@ public interface AngularParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitTypeAnnotated(AngularParser.TypeAnnotatedContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link AngularParser#typeExpr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitTypeExpr(AngularParser.TypeExprContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link AngularParser#typeTerm}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitTypeTerm(AngularParser.TypeTermContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code typeIdent}
 	 * labeled alternative in {@link AngularParser#typePrimary}.
@@ -457,6 +487,13 @@ public interface AngularParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitPropertyAcc(AngularParser.PropertyAccContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code optPropertyAcc}
+	 * labeled alternative in {@link AngularParser#postfixPart}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitOptPropertyAcc(AngularParser.OptPropertyAccContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code postFixIncr}
 	 * labeled alternative in {@link AngularParser#postfixPart}.
 	 * @param ctx the parse tree
@@ -477,6 +514,12 @@ public interface AngularParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitPropertyAccessing(AngularParser.PropertyAccessingContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link AngularParser#optionalPropertyAccess}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitOptionalPropertyAccess(AngularParser.OptionalPropertyAccessContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code postfixInc}
 	 * labeled alternative in {@link AngularParser#postfixIncrement}.
@@ -568,6 +611,27 @@ public interface AngularParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitObjLiteral(AngularParser.ObjLiteralContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code keyVal}
+	 * labeled alternative in {@link AngularParser#objectElement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitKeyVal(AngularParser.KeyValContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code spreadElem}
+	 * labeled alternative in {@link AngularParser#objectElement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSpreadElem(AngularParser.SpreadElemContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code spreadElemen}
+	 * labeled alternative in {@link AngularParser#spreadElement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSpreadElemen(AngularParser.SpreadElemenContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code keyValuePair}
 	 * labeled alternative in {@link AngularParser#keyValue}.

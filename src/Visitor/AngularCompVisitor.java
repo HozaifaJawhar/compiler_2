@@ -19,7 +19,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import Helpers.ScopeManager;
 
-public class AngularCompVisitor extends AngularParserBaseVisitor
+public class AngularCompVisitor extends AngularParserBaseVisitor<Object>
 {
     public SymbolTable s = new SymbolTable();
     public SemanticErrorReporter errorReporter = new SemanticErrorReporter();
@@ -28,27 +28,30 @@ public class AngularCompVisitor extends AngularParserBaseVisitor
     private Set<String> importedIdentifiers = new HashSet<>();
 
     private String currentModule = null;
+
     private Object resolveVariableValue(String varName) {
         SymbolTableInfo info = s.getSymbolInfo(varName);
         if (info != null && info.getValue() != null) {
             try {
                 return Integer.parseInt(info.getValue().toString());
-            } catch (NumberFormatException ignored) {
-            }
+            } catch (NumberFormatException ignored) { }
         }
         return null;
     }
 
     private String extractTypeName(TypeAnnotation type)
     {
-        if(type.getType() instanceof IdentifierType) {
-            return ((IdentifierType) type.getType()).getName();
+        if (type != null && type.getPrimaryType() instanceof IdentifierType) {
+            return ((IdentifierType) type.getPrimaryType()).getName();
         }
         return null;
     }
+
+    // ---------------- Program ----------------
+
     @Override
     public Object visitProgram(AngularParser.ProgramContext ctx) {
-        // 1) imports
+        // imports
         List<ImportStatement> importStatements = new ArrayList<>();
         for (AngularParser.ImportStatementContext importCtx : ctx.importStatement()) {
             ImportStatement impStmt = (ImportStatement) visit(importCtx);
@@ -62,12 +65,7 @@ public class AngularCompVisitor extends AngularParserBaseVisitor
             errorReporter.report(new ComponentImportMissingError("ComponentImportMissingError", line, column));
         }
 
-        List<InterfaceDeclaration> interfaces = new ArrayList<>();
-        for (AngularParser.InterfaceDeclarationContext ifaceCtx : ctx.interfaceDeclaration()) {
-            InterfaceDeclaration iface = (InterfaceDeclaration) visit(ifaceCtx);
-            interfaces.add(iface);
-        }
-
+        // components
         List<ComponentDefinition> components = new ArrayList<>();
         for (AngularParser.ComponentDefinitionContext compCtx : ctx.componentDefinition()) {
             ComponentDefinition component = (ComponentDefinition) visit(compCtx);
@@ -79,8 +77,11 @@ public class AngularCompVisitor extends AngularParserBaseVisitor
             errorReporter.report(new CircularDependencyError());
         }
 
-        return new Program(importStatements, interfaces, components);
+        // Program(imports, components)
+        return new Program(importStatements, components);
     }
+
+    // ---------------- Imports ----------------
 
     @Override
     public Object visitImportStmt(AngularParser.ImportStmtContext ctx) {
@@ -108,12 +109,10 @@ public class AngularCompVisitor extends AngularParserBaseVisitor
     public Object visitImportItemList(AngularParser.ImportItemListContext ctx)
     {
         List<ImportItem> items = new ArrayList<>();
-
         for (AngularParser.ImportItemContext itemCtx : ctx.importItem()) {
             ImportItem item = (ImportItem) visit(itemCtx);
             items.add(item);
         }
-
         return items;
     }
 
@@ -132,12 +131,13 @@ public class AngularCompVisitor extends AngularParserBaseVisitor
         return modulePath;
     }
 
+    // ---------------- Component ----------------
+
     @Override
     public Object visitComponentDef(AngularParser.ComponentDefContext ctx)
     {
         ComponentConfig config = (ComponentConfig) visit(ctx.componentConfig());
         ClassDeclaration classDeclaration = (ClassDeclaration) visit(ctx.classDeclaration());
-
         return new ComponentDefinition(config, classDeclaration);
     }
 
@@ -150,24 +150,23 @@ public class AngularCompVisitor extends AngularParserBaseVisitor
         List<ComponentProperty> properties = new ArrayList<>();
 
         for (AngularParser.ComponentPropertyContext propCtx : ctx.componentProperty()) {
-
             ComponentProperty property = (ComponentProperty) visit(propCtx);
             properties.add(property);
 
-            if(property instanceof ImportsProperty && property != null) {
+            if(property instanceof ImportsProperty) {
                 s.addVariable("Imports", "ImportsProperty",((ImportsProperty) property).getImports(), "Global");
             }
-            if(property instanceof StandaloneProperty && property != null) {
+            if(property instanceof StandaloneProperty) {
                 s.addVariable("Standalone", "StandaloneProperty", ((StandaloneProperty) property).getValue(), "Global");
             }
-            if(property instanceof StylesProperty && property != null) {
+            if(property instanceof StylesProperty) {
                 s.addVariable("Styles", "StylesProperty", new StylesProperty(((StylesProperty) property).getStyles()), "Global");
             }
-            if(property instanceof SelectorProperty && property != null) {
+            if(property instanceof SelectorProperty) {
                 hasSelector = true;
                 s.addVariable("Selector", "SelectorProperty",((SelectorProperty) property).getValue(), "Global");
             }
-            if(property instanceof TemplateProperty && property != null) {
+            if(property instanceof TemplateProperty) {
                 hasTemplate = true;
                 s.addVariable("Template", "TemplateProperty", new TemplateProperty(((TemplateProperty) property).getTemplate()), "Global");
             }
@@ -222,6 +221,8 @@ public class AngularCompVisitor extends AngularParserBaseVisitor
         return new StylesProperty(stylesList);
     }
 
+    // ---------------- Arrays / literals (array) ----------------
+
     @Override
     public Object visitArrayLiteralExpr(AngularParser.ArrayLiteralExprContext ctx)
     {
@@ -264,6 +265,8 @@ public class AngularCompVisitor extends AngularParserBaseVisitor
     {
         return visit(ctx.objectLiteral());
     }
+
+    // ---------------- Class ----------------
 
     @Override
     public Object visitClassDecl(AngularParser.ClassDeclContext ctx)
@@ -309,10 +312,11 @@ public class AngularCompVisitor extends AngularParserBaseVisitor
                 if (s.getValue(fieldName) != null) {
                     errorReporter.report(new DuplicateDeclarationError(fieldName, line, column));
                 } else {
-                    String fieldType = (field.getType() != null && field.getType().getPrimaryType() instanceof IdentifierType)
-                            ? ((IdentifierType) field.getType().getPrimaryType()).getName()
-                            : "any";
-
+                    String fieldType = "any";
+                    TypeAnnotation ta = field.getType();
+                    if (ta != null && ta.getPrimaryType() instanceof IdentifierType) {
+                        fieldType = ((IdentifierType) ta.getPrimaryType()).getName();
+                    }
                     s.addVariable(fieldName, fieldType, field.getInitializer(), scopeManager.getCurrentScope());
                 }
             }
@@ -410,12 +414,36 @@ public class AngularCompVisitor extends AngularParserBaseVisitor
         return new Parameter(paramName, type);
     }
 
+    // ---------------- Types ----------------
+
+    // typeAnnotation : typeExpr (LBRACKET RBRACKET)? #typeAnnotated ;
     @Override
     public Object visitTypeAnnotated(AngularParser.TypeAnnotatedContext ctx)
     {
-        TypePrimary typePrimary = (TypePrimary) visit(ctx.typePrimary());
+        TypePrimary primary = (TypePrimary) visit(ctx.typeExpr());
         boolean isArray = ctx.LBRACKET() != null && ctx.RBRACKET() != null;
-        return new TypeAnnotation(typePrimary, isArray);
+        return new TypeAnnotation(primary, isArray);
+    }
+
+    // typeExpr : typeTerm (PIPE typeTerm)* ;
+    @Override
+    public Object visitTypeExpr(AngularParser.TypeExprContext ctx)
+    {
+        // دعم union بشكل مبسّط: نأخذ أول term كـ primary
+        return visit(ctx.typeTerm(0));
+    }
+
+    // typeTerm : typePrimary | STRING_LITERAL ;
+    @Override
+    public Object visitTypeTerm(AngularParser.TypeTermContext ctx)
+    {
+        if (ctx.typePrimary() != null) {
+            return visit(ctx.typePrimary());
+        }
+        // نوع مكتوب كسلسلة مثل 'list' → نعامله كـ IdentifierType("list")
+        String raw = ctx.STRING_LITERAL().getText();
+        String unq = raw.substring(1, raw.length() - 1);
+        return new IdentifierType(unq);
     }
 
     @Override
@@ -428,7 +456,7 @@ public class AngularCompVisitor extends AngularParserBaseVisitor
     @Override
     public Object visitTypeAny(AngularParser.TypeAnyContext ctx)
     {
-        return new AnyType();
+        return new IdentifierType("any");
     }
 
     @Override
@@ -450,6 +478,8 @@ public class AngularCompVisitor extends AngularParserBaseVisitor
         TypeAnnotation type = (TypeAnnotation) visit(ctx.typeAnnotation());
         return new ObjectTypeMember(name, type);
     }
+
+    // ---------------- Statements / Block ----------------
 
     @Override
     public Object visitCodeBlock(AngularParser.CodeBlockContext ctx)
@@ -522,7 +552,8 @@ public class AngularCompVisitor extends AngularParserBaseVisitor
         TypeAnnotation typeAnnotation = null;
         if (ctx.typeAnnotation() != null) {
             typeAnnotation = (TypeAnnotation) visit(ctx.typeAnnotation());
-            typeString = extractTypeName(typeAnnotation);
+            String extracted = extractTypeName(typeAnnotation);
+            if (extracted != null) typeString = extracted;
         }
 
         Expression initializer = null;
@@ -539,6 +570,8 @@ public class AngularCompVisitor extends AngularParserBaseVisitor
 
         return new VariableDeclarationStatement(varName, typeAnnotation, initializer);
     }
+
+    // ---------------- Expressions ----------------
 
     @Override
     public Object visitExprStatement(AngularParser.ExprStatementContext ctx)
@@ -709,9 +742,9 @@ public class AngularCompVisitor extends AngularParserBaseVisitor
         Expression left = (Expression) visit(ctx.additiveExpression(0));
 
         for (int i = 1; i < ctx.additiveExpression().size(); i++) {
-            String op = ctx.getChild(2 * i - 1).getText(); // The operator is between expressions
+            String op = ctx.getChild(2 * i - 1).getText();
             Expression right = (Expression) visit(ctx.additiveExpression(i));
-            left = new BinaryExpression(left, op, right); // Nested BinaryExpressions for chaining
+            left = new BinaryExpression(left, op, right);
         }
 
         return left;
@@ -759,9 +792,9 @@ public class AngularCompVisitor extends AngularParserBaseVisitor
                 }
 
                 if (value instanceof Integer && ((Integer) value) == 0) {
-                    int line = ctx.unaryExpression(i).getStart().getLine();
-                    int column = ctx.unaryExpression(i).getStart().getCharPositionInLine();
-                    errorReporter.report(new DivisionByZeroError(op, line, column));
+                    int l = ctx.unaryExpression(i).getStart().getLine();
+                    int c = ctx.unaryExpression(i).getStart().getCharPositionInLine();
+                    errorReporter.report(new DivisionByZeroError(op, l, c));
                 }
             }
 
@@ -790,7 +823,17 @@ public class AngularCompVisitor extends AngularParserBaseVisitor
     @Override
     public Object visitPostfixExpr(AngularParser.PostfixExprContext ctx)
     {
-        Expression base = (Expression) visit(ctx.primaryExpression());
+        Object baseObj = visit(ctx.primaryExpression());
+        Expression base;
+        if (baseObj instanceof Expression) {
+            base = (Expression) baseObj;
+        } else if (baseObj instanceof String) {
+            base = new LiteralExpression((String) baseObj);
+        } else {
+            base = new LiteralExpression(String.valueOf(baseObj));
+        }
+
+        // ctor يتوقع List<Object>
         List<Object> parts = new ArrayList<>();
         for (AngularParser.PostfixPartContext partCtx : ctx.postfixPart()) {
             parts.add(visit(partCtx));
@@ -822,7 +865,7 @@ public class AngularCompVisitor extends AngularParserBaseVisitor
                 args.add((Expression) visit(exprCtx));
             }
         }
-        return new FunctionCallExpression(args);
+        return new FunctionCall(args);
     }
 
     @Override
@@ -830,6 +873,7 @@ public class AngularCompVisitor extends AngularParserBaseVisitor
         String propertyName = ctx.IDENTIFIER().getText();
         return new PropertyAccess(propertyName);
     }
+
     @Override
     public Object visitPostfixInc(AngularParser.PostfixIncContext ctx)
     {
@@ -848,6 +892,8 @@ public class AngularCompVisitor extends AngularParserBaseVisitor
         return new ThisExpression();
     }
 
+    // ---------------- Break ----------------
+
     @Override
     public Object visitBreakStmt(AngularParser.BreakStmtContext ctx) {
         return visit(ctx.breakStatement());
@@ -857,6 +903,8 @@ public class AngularCompVisitor extends AngularParserBaseVisitor
     public Object visitBreakStatement(AngularParser.BreakStatementContext ctx) {
         return new BreakStatement();
     }
+
+    // ---------------- Identifiers / new / arrow / objects / arrays ----------------
 
     @Override
     public Object visitIdentifierExpr(AngularParser.IdentifierExprContext ctx)
@@ -906,7 +954,12 @@ public class AngularCompVisitor extends AngularParserBaseVisitor
     @Override
     public Object visitArrayExpr(AngularParser.ArrayExprContext ctx)
     {
-        return visit(ctx.arrayLiteral());
+        // اجعل array literal دائمًا Expression لتفادي ClassCast
+        List<Object> items = (List<Object>) visit(ctx.arrayLiteral());
+        if (items == null || items.isEmpty()) {
+            return new LiteralExpression("[]");
+        }
+        return new LiteralExpression("<array>");
     }
 
     @Override
@@ -954,23 +1007,32 @@ public class AngularCompVisitor extends AngularParserBaseVisitor
         return params;
     }
 
+    // ---------------- Object literal ----------------
+
     @Override
     public Object visitObjLiteral(AngularParser.ObjLiteralContext ctx)
     {
+        // Grammar: objectLiteral : LBRACE (objectElement (COMMA objectElement)*)? RBRACE ;
         List<ObjectProperty> properties = new ArrayList<>();
-        if (ctx.keyValue() != null) {
-            for (AngularParser.KeyValueContext kvCtx : ctx.keyValue()) {
-                if (kvCtx instanceof AngularParser.KeyValuePairContext) {
-                    AngularParser.KeyValuePairContext pairCtx = (AngularParser.KeyValuePairContext) kvCtx;
 
-                    String key = pairCtx.IDENTIFIER().getText();
-
-                    Expression value = (Expression) visit(pairCtx.expression());
-
-                    properties.add(new ObjectProperty(key, value));
+        if (ctx.objectElement() != null) {
+            for (AngularParser.ObjectElementContext elCtx : ctx.objectElement()) {
+                if (elCtx instanceof AngularParser.KeyValContext) {
+                    AngularParser.KeyValueContext kv = ((AngularParser.KeyValContext) elCtx).keyValue();
+                    if (kv instanceof AngularParser.KeyValuePairContext) {
+                        AngularParser.KeyValuePairContext pair = (AngularParser.KeyValuePairContext) kv;
+                        String key = pair.IDENTIFIER().getText();
+                        Expression value = (Expression) visit(pair.expression());
+                        properties.add(new ObjectProperty(key, value));
+                    }
+                    // لو ظهرت بدائل أخرى مستقبلاً، نتجاهلها بأمان هنا.
+                } else if (elCtx instanceof AngularParser.SpreadElemContext) {
+                    // spread: ELLIPSIS expression
+                    // غير مدعوم في AST الحالي؛ نتجاهله بدون كسر البناء.
                 }
             }
         }
+
         return new ObjectExpression(properties);
     }
 
@@ -982,18 +1044,22 @@ public class AngularCompVisitor extends AngularParserBaseVisitor
         return new ObjectProperty(key, value);
     }
 
+    // ---------------- Literals ----------------
+
     @Override
     public Object visitStringLiteral(AngularParser.StringLiteralContext ctx)
     {
         String rawText = ctx.STRING_LITERAL().getText();
         String unquoted = rawText.substring(1, rawText.length() - 1);
-        return new StringLiteral(unquoted);
+        return new LiteralExpression(unquoted);
     }
 
     @Override
     public Object visitTemplateLiteral(AngularParser.TemplateLiteralContext ctx)
     {
-        return new LiteralExpression(ctx.BACKTICK_LITERAL().getText());
+        String raw = ctx.BACKTICK_LITERAL().getText();
+        String unquoted = raw.substring(1, raw.length() - 1);
+        return new LiteralExpression(unquoted);
     }
 
     @Override
@@ -1031,3 +1097,4 @@ public class AngularCompVisitor extends AngularParserBaseVisitor
         return new QualifiedName(parts);
     }
 }
+
