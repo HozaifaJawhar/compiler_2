@@ -1,4 +1,4 @@
-// Generated from C:/Users/pc/Compiler/compiler_2/src/antlr/AngularParser.g4 by ANTLR 4.13.2
+// Generated from /Users/hozaifajohar/Desktop/desk/COLLAGE_FORTH_YEAR/AngularCompiler/compiler_2/src/antlr/AngularParser.g4 by ANTLR 4.13.2
 package antlr;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
@@ -1036,25 +1036,41 @@ public interface AngularParserListener extends ParseTreeListener {
 	 */
 	void exitObjLiteral(AngularParser.ObjLiteralContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link AngularParser#objectElement}.
+	 * Enter a parse tree produced by the {@code keyVal}
+	 * labeled alternative in {@link AngularParser#objectElement}.
 	 * @param ctx the parse tree
 	 */
-	void enterObjectElement(AngularParser.ObjectElementContext ctx);
+	void enterKeyVal(AngularParser.KeyValContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link AngularParser#objectElement}.
+	 * Exit a parse tree produced by the {@code keyVal}
+	 * labeled alternative in {@link AngularParser#objectElement}.
 	 * @param ctx the parse tree
 	 */
-	void exitObjectElement(AngularParser.ObjectElementContext ctx);
+	void exitKeyVal(AngularParser.KeyValContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link AngularParser#spreadElement}.
+	 * Enter a parse tree produced by the {@code spreadElem}
+	 * labeled alternative in {@link AngularParser#objectElement}.
 	 * @param ctx the parse tree
 	 */
-	void enterSpreadElement(AngularParser.SpreadElementContext ctx);
+	void enterSpreadElem(AngularParser.SpreadElemContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link AngularParser#spreadElement}.
+	 * Exit a parse tree produced by the {@code spreadElem}
+	 * labeled alternative in {@link AngularParser#objectElement}.
 	 * @param ctx the parse tree
 	 */
-	void exitSpreadElement(AngularParser.SpreadElementContext ctx);
+	void exitSpreadElem(AngularParser.SpreadElemContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code spreadElemen}
+	 * labeled alternative in {@link AngularParser#spreadElement}.
+	 * @param ctx the parse tree
+	 */
+	void enterSpreadElemen(AngularParser.SpreadElemenContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code spreadElemen}
+	 * labeled alternative in {@link AngularParser#spreadElement}.
+	 * @param ctx the parse tree
+	 */
+	void exitSpreadElemen(AngularParser.SpreadElemenContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code keyValuePair}
 	 * labeled alternative in {@link AngularParser#keyValue}.

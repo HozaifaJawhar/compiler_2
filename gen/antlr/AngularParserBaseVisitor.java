@@ -1,4 +1,4 @@
-// Generated from C:/Users/pc/Compiler/compiler_2/src/antlr/AngularParser.g4 by ANTLR 4.13.2
+// Generated from /Users/hozaifajohar/Desktop/desk/COLLAGE_FORTH_YEAR/AngularCompiler/compiler_2/src/antlr/AngularParser.g4 by ANTLR 4.13.2
 package antlr;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
@@ -627,14 +627,21 @@ public class AngularParserBaseVisitor<T> extends AbstractParseTreeVisitor<T> imp
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitObjectElement(AngularParser.ObjectElementContext ctx) { return visitChildren(ctx); }
+	@Override public T visitKeyVal(AngularParser.KeyValContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitSpreadElement(AngularParser.SpreadElementContext ctx) { return visitChildren(ctx); }
+	@Override public T visitSpreadElem(AngularParser.SpreadElemContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitSpreadElemen(AngularParser.SpreadElemenContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

@@ -1,4 +1,4 @@
-// Generated from C:/Users/pc/Compiler/compiler_2/src/antlr/AngularParser.g4 by ANTLR 4.13.2
+// Generated from /Users/hozaifajohar/Desktop/desk/COLLAGE_FORTH_YEAR/AngularCompiler/compiler_2/src/antlr/AngularParser.g4 by ANTLR 4.13.2
 package antlr;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -1061,25 +1061,37 @@ public class AngularParserBaseListener implements AngularParserListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterObjectElement(AngularParser.ObjectElementContext ctx) { }
+	@Override public void enterKeyVal(AngularParser.KeyValContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitObjectElement(AngularParser.ObjectElementContext ctx) { }
+	@Override public void exitKeyVal(AngularParser.KeyValContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSpreadElement(AngularParser.SpreadElementContext ctx) { }
+	@Override public void enterSpreadElem(AngularParser.SpreadElemContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitSpreadElement(AngularParser.SpreadElementContext ctx) { }
+	@Override public void exitSpreadElem(AngularParser.SpreadElemContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterSpreadElemen(AngularParser.SpreadElemenContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSpreadElemen(AngularParser.SpreadElemenContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

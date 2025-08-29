@@ -1,4 +1,4 @@
-// Generated from C:/Users/pc/Compiler/compiler_2/src/antlr/AngularParser.g4 by ANTLR 4.13.2
+// Generated from /Users/hozaifajohar/Desktop/desk/COLLAGE_FORTH_YEAR/AngularCompiler/compiler_2/src/antlr/AngularParser.g4 by ANTLR 4.13.2
 package antlr;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
@@ -612,17 +612,26 @@ public interface AngularParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitObjLiteral(AngularParser.ObjLiteralContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link AngularParser#objectElement}.
+	 * Visit a parse tree produced by the {@code keyVal}
+	 * labeled alternative in {@link AngularParser#objectElement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitObjectElement(AngularParser.ObjectElementContext ctx);
+	T visitKeyVal(AngularParser.KeyValContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link AngularParser#spreadElement}.
+	 * Visit a parse tree produced by the {@code spreadElem}
+	 * labeled alternative in {@link AngularParser#objectElement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitSpreadElement(AngularParser.SpreadElementContext ctx);
+	T visitSpreadElem(AngularParser.SpreadElemContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code spreadElemen}
+	 * labeled alternative in {@link AngularParser#spreadElement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSpreadElemen(AngularParser.SpreadElemenContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code keyValuePair}
 	 * labeled alternative in {@link AngularParser#keyValue}.

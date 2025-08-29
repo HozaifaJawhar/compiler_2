@@ -1,4 +1,4 @@
-// Generated from C:/Users/pc/Compiler/compiler_2/src/antlr/AngularParser.g4 by ANTLR 4.13.2
+// Generated from /Users/hozaifajohar/Desktop/desk/COLLAGE_FORTH_YEAR/AngularCompiler/compiler_2/src/antlr/AngularParser.g4 by ANTLR 4.13.2
 package antlr;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
@@ -5300,27 +5300,53 @@ public class AngularParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class ObjectElementContext extends ParserRuleContext {
-		public KeyValueContext keyValue() {
-			return getRuleContext(KeyValueContext.class,0);
-		}
-		public SpreadElementContext spreadElement() {
-			return getRuleContext(SpreadElementContext.class,0);
-		}
 		public ObjectElementContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_objectElement; }
+	 
+		public ObjectElementContext() { }
+		public void copyFrom(ObjectElementContext ctx) {
+			super.copyFrom(ctx);
+		}
+	}
+	@SuppressWarnings("CheckReturnValue")
+	public static class SpreadElemContext extends ObjectElementContext {
+		public SpreadElementContext spreadElement() {
+			return getRuleContext(SpreadElementContext.class,0);
+		}
+		public SpreadElemContext(ObjectElementContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof AngularParserListener ) ((AngularParserListener)listener).enterObjectElement(this);
+			if ( listener instanceof AngularParserListener ) ((AngularParserListener)listener).enterSpreadElem(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof AngularParserListener ) ((AngularParserListener)listener).exitObjectElement(this);
+			if ( listener instanceof AngularParserListener ) ((AngularParserListener)listener).exitSpreadElem(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof AngularParserVisitor ) return ((AngularParserVisitor<? extends T>)visitor).visitObjectElement(this);
+			if ( visitor instanceof AngularParserVisitor ) return ((AngularParserVisitor<? extends T>)visitor).visitSpreadElem(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+	@SuppressWarnings("CheckReturnValue")
+	public static class KeyValContext extends ObjectElementContext {
+		public KeyValueContext keyValue() {
+			return getRuleContext(KeyValueContext.class,0);
+		}
+		public KeyValContext(ObjectElementContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof AngularParserListener ) ((AngularParserListener)listener).enterKeyVal(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof AngularParserListener ) ((AngularParserListener)listener).exitKeyVal(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof AngularParserVisitor ) return ((AngularParserVisitor<? extends T>)visitor).visitKeyVal(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -5333,6 +5359,7 @@ public class AngularParser extends Parser {
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case IDENTIFIER:
+				_localctx = new KeyValContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
 				setState(574);
@@ -5340,6 +5367,7 @@ public class AngularParser extends Parser {
 				}
 				break;
 			case ELLIPSIS:
+				_localctx = new SpreadElemContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
 				setState(575);
@@ -5363,25 +5391,34 @@ public class AngularParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class SpreadElementContext extends ParserRuleContext {
-		public TerminalNode ELLIPSIS() { return getToken(AngularParser.ELLIPSIS, 0); }
-		public ExpressionContext expression() {
-			return getRuleContext(ExpressionContext.class,0);
-		}
 		public SpreadElementContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_spreadElement; }
+	 
+		public SpreadElementContext() { }
+		public void copyFrom(SpreadElementContext ctx) {
+			super.copyFrom(ctx);
+		}
+	}
+	@SuppressWarnings("CheckReturnValue")
+	public static class SpreadElemenContext extends SpreadElementContext {
+		public TerminalNode ELLIPSIS() { return getToken(AngularParser.ELLIPSIS, 0); }
+		public ExpressionContext expression() {
+			return getRuleContext(ExpressionContext.class,0);
+		}
+		public SpreadElemenContext(SpreadElementContext ctx) { copyFrom(ctx); }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof AngularParserListener ) ((AngularParserListener)listener).enterSpreadElement(this);
+			if ( listener instanceof AngularParserListener ) ((AngularParserListener)listener).enterSpreadElemen(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof AngularParserListener ) ((AngularParserListener)listener).exitSpreadElement(this);
+			if ( listener instanceof AngularParserListener ) ((AngularParserListener)listener).exitSpreadElemen(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof AngularParserVisitor ) return ((AngularParserVisitor<? extends T>)visitor).visitSpreadElement(this);
+			if ( visitor instanceof AngularParserVisitor ) return ((AngularParserVisitor<? extends T>)visitor).visitSpreadElemen(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -5390,6 +5427,7 @@ public class AngularParser extends Parser {
 		SpreadElementContext _localctx = new SpreadElementContext(_ctx, getState());
 		enterRule(_localctx, 116, RULE_spreadElement);
 		try {
+			_localctx = new SpreadElemenContext(_localctx);
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(578);
