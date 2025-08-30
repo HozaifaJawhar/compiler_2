@@ -32,7 +32,7 @@ public class SymbolTable
         if (symbolTable.containsKey(variableName)) {
             return symbolTable.get(variableName);
         } else {
-            System.out.println("Variable " + variableName + " does not exist in the symbol table!");
+
             return null;
         }
     }
@@ -44,31 +44,39 @@ public class SymbolTable
 
     @Override
     public String toString() {
+        if (symbolTable.isEmpty()) {
+            return "Symbol Table is empty.";
+        }
+
         StringBuilder builder = new StringBuilder();
-        builder.append("Symbol Table:\n")
-                .append("*").append("*".repeat(420)).append("*\n")
-                .append(String.format("| %-10s | %-25s | %-30s | %-105s | %-25s \n", "ID", "VariableName", "Type", "Value", "Scope"))
-                .append("*").append("*".repeat(420)).append("*\n");
+
+        // ✅ تم تعديل طول الخط هنا من 140 إلى 144 ليطابق عرض الأعمدة
+        String horizontalLine = "─".repeat(144);
+
+        // عرض الأعمدة: 10 + 25 + 30 + 40 + 25 = 130 للمحتوى
+        // + (2*5 لل padding) + (6 | للفواصل) = 146 العرض الكلي
+        // الخط الأفقي يكون 146 - 2 (للزوايا) = 144
+        String header = String.format("│ %-10s │ %-25s │ %-30s │ %-40s │ %-25s │", "ID", "Variable Name", "Type", "Value", "Scope");
+
+        builder.append("┌").append(horizontalLine).append("┐\n");
+        builder.append(header).append("\n");
+        builder.append("├").append(horizontalLine).append("┤\n");
 
         int id = 1;
         for (Map.Entry<String, SymbolTableInfo> entry : symbolTable.entrySet()) {
             SymbolTableInfo info = entry.getValue();
-            String[] valueLines = String.valueOf(info.getValue()).split("\\n");
-            String[] nameLines = info.getName().split("\\n");
-            int maxLines = Math.max(valueLines.length, nameLines.length);
-
-            builder.append(String.format("| %-10d | %-25s | %-30s | %-105s | %-25s \n",
-                    id++, nameLines[0], info.getType(), valueLines[0], info.getScope()));
-
-            for (int i = 1; i < maxLines; i++) {
-                builder.append(String.format("| %-10s | %-25s | %-30s | %-105s | %-25s \n",
-                        "", (i < nameLines.length) ? nameLines[i] : "",
-                        "", (i < valueLines.length) ? valueLines[i] : "", ""));
+            String valueStr = (info.getValue() != null) ? info.getValue().toString() : "null";
+            // اقتصاص القيمة الطويلة لتجنب تشويه الجدول
+            if (valueStr.length() > 38) {
+                valueStr = valueStr.substring(0, 35) + "...";
             }
 
-            builder.append("*").append("*".repeat(420)).append("*\n");
+            builder.append(String.format("│ %-10d │ %-25s │ %-30s │ %-40s │ %-25s │",
+                    id++, info.getName(), info.getType(), valueStr, info.getScope()));
+            builder.append("\n");
         }
 
+        builder.append("└").append(horizontalLine).append("┘\n");
         return builder.toString();
     }
 }

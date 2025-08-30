@@ -1,89 +1,101 @@
 package App;
 
+// ANTLR and AST Imports
 import AST.ASTNode;
 import AST.Program;
-import Semantic.SemanticError;
 import Visitor.AngularCompVisitor;
 import antlr.AngularLexer;
 import antlr.AngularParser;
-import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
-import java.io.IOException;
-import antlr.AngularParser;
-import antlr.AngularParserBaseVisitor;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.*;
 
+// Semantic Analysis Imports
+import Semantic.SemanticError;
+
+// Code Generation Imports
 import generator.AngularCodeGenerator;
 import generator.AngularCodeGenerator.GenOptions;
 
-import java.nio.file.*;
-import java.util.Map;
+// Java Standard Library Imports
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Map;
 
 public class Main {
 
     public static void main(String[] args) {
         try {
-            // تحديد الملف المدخل
-            String inputFile = "test/test_main.txt"; // استبدل بالمسار الفعلي للملف
-            CharStream input = CharStreams.fromFileName(inputFile);
+            // ✅ تحديد الملف المدخل مباشرة في الكود كما طلبت
+            String inputFile = "test/test7.txt";
 
-            // إعداد الـ Lexer و Parser
+            // 1. إعداد الـ Lexer و Parser
+            CharStream input = CharStreams.fromFileName(inputFile);
             AngularLexer lexer = new AngularLexer(input);
             CommonTokenStream tokens = new CommonTokenStream(lexer);
             AngularParser parser = new AngularParser(tokens);
 
-            // تحليل الشجرة
+            // 2. تحليل الكود وإنشاء شجرة التحليل (Parse Tree)
             ParseTree tree = parser.program();
 
-            // معالجة الـ AST باستخدام Visitor
+            // 3. زيارة الشجرة باستخدام Visitor لبناء شجرة AST
             AngularCompVisitor visitor = new AngularCompVisitor();
             ASTNode ast = (ASTNode) visitor.visit(tree);
 
+            // --- بداية طباعة الخرج المنظم ---
+
+            // 4. طباعة شجرة AST مع عنوان واضح
+            System.out.println("============== Abstract Syntax Tree (AST) ==============");
             System.out.println(ast);
-            System.out.println();  // سطر فاصل بين الـ AST والمخرجات التالية
+            System.out.println("========================================================");
+            System.out.println();
 
+            // 5. طباعة جدول الرموز
+            System.out.println("==============  Symbol Table ==============");
             System.out.println(visitor.s.toString());
+            System.out.println("==========================================");
+            System.out.println();
 
-            // التحقق من وجود أخطاء دلالية
+            // 6. طباعة الأخطاء الدلالية (إن وجدت)
+            System.out.println("============== Semantic Analysis ==============");
             if (!visitor.errorReporter.getErrors().isEmpty()) {
-                System.out.println("Semantic Errors found:");
+                System.out.println("Found " + visitor.errorReporter.getErrors().size() + " Semantic Errors:");
                 for (SemanticError error : visitor.errorReporter.getErrors()) {
-                    System.out.println(error);
+                    System.out.println("- " + error);
                 }
             } else {
                 System.out.println("No Semantic Errors detected.");
             }
+            System.out.println("=============================================");
+            System.out.println();
 
-            // ====== توليد الكود ======
+            // 7. طباعة حالة توليد الكود
+            System.out.println("============== Code Generation ==============");
             GenOptions options = new GenOptions();
-            options.mode = AngularCodeGenerator.Mode.INLINE; // وضع INLINE لتطابق مع الاختبارات
-            options.baseFileName = "CodeGenerated";  // اسم الملف الناتج بدون امتداد
+            options.mode = AngularCodeGenerator.Mode.INLINE;
+            options.baseFileName = "CodeGenerated";
 
-            // إعداد مولد الكود
             AngularCodeGenerator codeGenerator = new AngularCodeGenerator(options);
-            Map<String, String> files = codeGenerator.generate((Program) ast);  // تحويل الـ AST إلى Program
+            Map<String, String> files = codeGenerator.generate((Program) ast);
 
-            // كتابة الملفات الناتجة إلى مجلد 'out_ts'
             Path outDir = Paths.get("out_ts");
-            Files.createDirectories(outDir);  // إنشاء مجلد الخرج إذا لم يكن موجودًا
+            Files.createDirectories(outDir);
 
-            // طباعة الكود المولد في الملفات
             for (Map.Entry<String, String> entry : files.entrySet()) {
                 Path filePath = outDir.resolve(entry.getKey());
                 Files.writeString(filePath, entry.getValue());
                 System.out.println("Generated: " + filePath);
             }
-
-            System.out.println("Code generation completed successfully!");
+            System.out.println("\nCode generation completed successfully!");
+            System.out.println("=========================================");
 
         } catch (IOException e) {
             System.err.println("Failed to read input file: " + e.getMessage());
         } catch (Exception e) {
-            System.err.println("Parsing error: " + e.getMessage());
+            System.err.println("An unexpected error occurred: " + e.getMessage());
             e.printStackTrace();
         }
     }
