@@ -30,7 +30,7 @@ public class Main {
     public static void main(String[] args) {
         try {
             // ✅ تحديد الملف المدخل مباشرة في الكود كما طلبت
-            String inputFile = "test/test7.txt";
+            String inputFile = "test/test_main.txt";
 
             // 1. إعداد الـ Lexer و Parser
             CharStream input = CharStreams.fromFileName(inputFile);
