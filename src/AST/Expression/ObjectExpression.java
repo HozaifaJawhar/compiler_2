@@ -1,7 +1,6 @@
 package AST.Expression;
 
-import  AST.Properties.ObjectProperty;
-
+import AST.Properties.ObjectProperty;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,7 +26,7 @@ public class ObjectExpression implements Expression {
     private final List<Element> elements;
 
     public ObjectExpression(List<Element> elements) {
-        this.elements = elements;
+        this.elements = elements == null ? new ArrayList<>() : elements;
     }
 
     public List<ObjectProperty> getProperties() {

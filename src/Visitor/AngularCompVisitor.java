@@ -384,24 +384,42 @@ public class AngularCompVisitor extends AngularParserBaseVisitor<Object>
 
     // typeAnnotation : typeExpr (LBRACKET RBRACKET)? #typeAnnotated ;
     @Override
-    public Object visitTypeAnnotated(AngularParser.TypeAnnotatedContext ctx) {
-        TypePrimary primary = (TypePrimary) visit(ctx.typeExpr());
-        // ✅ عندك الconstructor أحادي الوسيط
-        return new TypeAnnotation(primary);
+    public Object visitTypeAnnotated(antlr.AngularParser.TypeAnnotatedContext ctx) {
+        boolean isArray = ctx.LBRACKET() != null && ctx.RBRACKET() != null;
+        // سنبني TypeAnnotation من typeExpr
+        TypeAnnotation ann = (TypeAnnotation) visit(ctx.typeExpr());
+        // ann هنا يحمل terms فقط بدون isArray — نُضيف العلم isArray ونُعيد نسخة جديدة
+        return TypeAnnotation.union(ann.getTerms(), isArray);
     }
 
     // typeExpr : typeTerm (PIPE typeTerm)* ;
     @Override
-    public Object visitTypeExpr(AngularParser.TypeExprContext ctx) {
-        return visit(ctx.typeTerm(0)); // union مبسّط
+    public Object visitTypeExpr(antlr.AngularParser.TypeExprContext ctx) {
+        List<String> terms = new ArrayList<>();
+        int n = ctx.typeTerm().size();
+        for (int i = 0; i < n; i++) {
+            // نأخذ النص الأصلي لكل term كما هو من القواعد (يحافظ على علامات الاقتباس لأنواع string literal)
+            String termTs = ctx.typeTerm(i).getText().trim();
+            terms.add(termTs);
+        }
+        // لا نحدد الـ array هنا — يتم في visitTypeAnnotated أعلاه
+        return TypeAnnotation.union(terms, false);
     }
 
     // typeTerm : typePrimary | STRING_LITERAL ;
     @Override
-    public Object visitTypeTerm(AngularParser.TypeTermContext ctx) {
-        if (ctx.typePrimary() != null) return visit(ctx.typePrimary());
-        String raw = ctx.STRING_LITERAL().getText();
-        return new IdentifierType(raw.substring(1, raw.length() - 1));
+    public Object visitTypeTerm(antlr.AngularParser.TypeTermContext ctx) {
+        // هذه الدالة لن تُستدعى الآن لأننا بنينا الـ terms نصيًا في visitTypeExpr
+        // ولكن نتركها آمنة لو استُدعيت.
+        if (ctx.STRING_LITERAL() != null) {
+            return TypeAnnotation.single(ctx.STRING_LITERAL().getText().trim(), false);
+        }
+        // لو عندك typePrimary → نسترجع نصه:
+        if (ctx.typePrimary() != null) {
+            String raw = ctx.typePrimary().getText().trim();
+            return TypeAnnotation.single(raw, false);
+        }
+        return TypeAnnotation.single("", false);
     }
 
     @Override
@@ -678,44 +696,43 @@ public class AngularCompVisitor extends AngularParserBaseVisitor<Object>
     }
 
     @Override
-    public Object visitPostfixExpr(AngularParser.PostfixExprContext ctx) {
-        Object baseObj = visit(ctx.primaryExpression());
-        Expression base;
-        if (baseObj instanceof Expression) {
-            base = (Expression) baseObj;
-        } else if (baseObj instanceof String) {
-            base = new LiteralExpression((String) baseObj);
-        } else {
-            base = new LiteralExpression(String.valueOf(baseObj));
-        }
+    public Object visitPostfixExpr(antlr.AngularParser.PostfixExprContext ctx) {
+        AST.Expression.Expression base = (AST.Expression.Expression) visit(ctx.primaryExpression());
 
-        // ✅ مُنشئ PostfixExpression يتطلب List<PostfixPart>
-        List<PostfixPart> parts = new ArrayList<>();
-        for (AngularParser.PostfixPartContext partCtx : ctx.postfixPart()) {
-            parts.add((PostfixPart) visit(partCtx));
-        }
-        return new PostfixExpression(base, parts);
-    }
-
-    @Override
-    public Object visitFuncCall(AngularParser.FunctCallContext ctx) {
-        List<Expression> args = new ArrayList<>();
-        if (ctx.expression() != null) {
-            for (AngularParser.ExpressionContext e : ctx.expression()) {
-                args.add((Expression) visit(e));
+        java.util.List<AST.Expression.PostfixPart> parts = new java.util.ArrayList<>();
+        for (antlr.AngularParser.PostfixPartContext partCtx : ctx.postfixPart()) {
+            Object v = visit(partCtx);
+            if (v instanceof AST.Expression.PostfixPart p) {
+                parts.add(p);
+            } else {
+                // fallback آمن: لا تدخل null إلى القائمة
+                parts.add(new AST.Expression.PostfixUnknown(partCtx.getText()));
             }
         }
-        return new FunctionCall(args); // يفترض أنه implements PostfixPart
+        return new AST.Expression.PostfixExpression(base, parts);
+    }
+
+
+    @Override
+    public Object visitFuncCall(antlr.AngularParser.FunctCallContext ctx) {
+        java.util.List<AST.Expression.Expression> args = new java.util.ArrayList<>();
+        if (ctx.expression() != null) {
+            for (var e : ctx.expression()) {
+                args.add((AST.Expression.Expression) visit(e));
+            }
+        }
+        return new AST.Expression.FunctionCallPostfix(args);
     }
 
     @Override
-    public Object visitPropertyAccessing(AngularParser.PropertyAccessingContext ctx) {
-        return new PropertyAccess(ctx.IDENTIFIER().getText()); // يفترض أنه implements PostfixPart
+    public Object visitPropertyAccessing(antlr.AngularParser.PropertyAccessingContext ctx) {
+        String propertyName = ctx.IDENTIFIER().getText();
+        return new AST.Expression.PropertyAccess(propertyName);
     }
 
     @Override
-    public Object visitPostfixInc(AngularParser.PostfixIncContext ctx) {
-        return new PostfixIncrement(); // يفترض أنه implements PostfixPart
+    public Object visitPostfixInc(antlr.AngularParser.PostfixIncContext ctx) {
+        return new AST.Expression.PostfixIncrement();
     }
 
     @Override

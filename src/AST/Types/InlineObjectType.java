@@ -7,13 +7,9 @@ import java.util.StringJoiner;
 public class InlineObjectType implements ASTNode {
     private final List<ObjectTypeMember> _members;
 
-    public InlineObjectType(List<ObjectTypeMember> members) {
-        this._members = members;
-    }
+    public InlineObjectType(List<ObjectTypeMember> members) { this._members = members; }
 
-    public List<ObjectTypeMember> getMembers() {
-        return _members;
-    }
+    public List<ObjectTypeMember> getMembers() { return _members; }
 
     @Override
     public String toString() {
