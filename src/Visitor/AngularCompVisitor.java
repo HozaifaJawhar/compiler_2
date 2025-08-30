@@ -754,6 +754,9 @@ public class AngularCompVisitor extends AngularParserBaseVisitor<Object>
     @Override
     public Object visitIdentifierExpr(AngularParser.IdentifierExprContext ctx) {
         String varName = ctx.IDENTIFIER().getText();
+        if ("null".equals(varName)) {
+            return new LiteralExpression("null"); // عندك الcodegen أصلاً يتعرف على "null" ويطبعها null
+        }
         int line = ctx.IDENTIFIER().getSymbol().getLine();
         int column = ctx.IDENTIFIER().getSymbol().getCharPositionInLine();
 
