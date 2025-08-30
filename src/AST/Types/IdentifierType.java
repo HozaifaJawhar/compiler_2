@@ -2,7 +2,7 @@ package AST.Types;
 
 import AST.ASTNode;
 
-public class IdentifierType implements ASTNode {
+public class IdentifierType implements ASTNode, TypePrimary {
     private final String _name;
 
     public IdentifierType(String name) {
