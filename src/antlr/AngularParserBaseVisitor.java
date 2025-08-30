@@ -11,7 +11,7 @@ import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
  * operations with no return type.
  */
 @SuppressWarnings("CheckReturnValue")
-public class AngularParserBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements AngularParserVisitor<T> {
+public abstract class AngularParserBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements AngularParserVisitor<T> {
 	/**
 	 * {@inheritDoc}
 	 *
@@ -516,7 +516,10 @@ public class AngularParserBaseVisitor<T> extends AbstractParseTreeVisitor<T> imp
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public T visitFunctCall(AngularParser.FunctCallContext ctx) { return visitChildren(ctx); }
-	/**
+
+    public abstract Object visitFuncCall(AngularParser.FunctCallContext ctx);
+
+    /**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
